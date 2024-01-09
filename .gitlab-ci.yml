@@ -2,6 +2,11 @@ stages:
 - test
 - build
 
+variables:
+  VERSION: "0.1"
+  DOCKER_HOST: tcp://docker:2375
+  DOCKER_TLS_CERTDIR: ""
+
 run_tests:
   stage: test
   before_script:
@@ -18,3 +23,13 @@ sast:
   stage: test
 include:
 - template: Security/SAST.gitlab-ci.yml
+
+run_build:
+  image: docker:latest
+  services:
+    - docker:dind
+  stage: build
+  script:
+    - docker build -t registry.gitlab.com/formation-dj/docker/usine-logicielle-webapp:$VERSION .
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD registry.gitlab.com
+    - docker push registry.gitlab.com/formation-dj/docker/usine-logicielle-webapp:$VERSION
