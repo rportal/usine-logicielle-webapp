@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: usine-logicielle-webapp
+  labels:
+    app: nodejs
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nodejs
+  template:
+    metadata:
+      labels:
+        app: nodejs
+    spec:
+      containers:
+      - name: nodejs
+        image: registry.gitlab.com/formation-dj/docker/usine-logicielle-webapp:0.1
+        ports:
+        - containerPort: 80
+      imagePullSecrets:
+      - name: gitlab-registry
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: webapp-service
+spec:
+  selector:
+    app: nodejs
+  ports:
+  - protocol: TCP
+    port: 8000
+    targetPort: 3000
